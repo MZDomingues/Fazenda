@@ -1,0 +1,159 @@
+unit clsFazenda;
+
+interface
+
+Uses
+  System.SysUtils, FireDAC.Comp.Client;
+
+Type
+  TFazenda = Class
+  private
+    FConexao         : TFDConnection;
+    FId_Fazenda      : Integer;
+    FNome            : String;
+    procedure SetNome(const Value: String);
+  public
+    property Conexao         : TFDConnection read FConexao         write FConexao;
+    property Id_Fazenda      : Integer       read FId_Fazenda      write FId_Fazenda;
+    property Nome            : String        read FNome            write SetNome;
+
+    constructor Create(Conexao : TFDConnection);
+    destructor Destroy; Override;
+
+    function Gerar_ID() : Integer;
+    function fnc_Salvar(i_Operacao : Integer; out s_Erro : String) : boolean;
+    function fnc_Consultar(s_Texto : String) : TFDQuery;
+    procedure prc_Deletar(i_id_chave : Integer);
+  End;
+
+var
+  fqConsultar : TFDQuery;
+
+implementation
+
+{ TFazenda }
+
+uses dmFazenda;
+
+constructor TFazenda.Create(Conexao: TFDConnection);
+begin
+  FConexao               := Conexao;
+  fqConsultar            := TFDQuery.Create(nil);
+  fqConsultar.Connection := FConexao;
+end;
+
+destructor TFazenda.Destroy;
+begin
+  fqConsultar.Destroy;
+  inherited;
+end;
+
+function TFazenda.fnc_Consultar(s_Texto: String): TFDQuery;
+begin
+  try
+    FConexao.Connected := False;
+    FConexao.Connected := True;
+
+    fqConsultar.Close;
+    fqConsultar.sql.Clear;
+    fqConsultar.sql.Add('select id,                     ' +
+                         '      nome                    ' +
+                         ' from fazenda                 ' +
+                         'where nome like :p_texto      '
+                        );
+    fqConsultar.ParamByName('p_Texto').AsString := '%' + s_Texto + '%';
+    fqConsultar.Open;
+  finally
+    Result := fqConsultar;
+  end;
+
+end;
+
+function TFazenda.fnc_Salvar(i_Operacao: Integer; out s_Erro: String): boolean;
+var
+  fqSalvar: TFDQuery;
+begin
+  try
+    try
+      FConexao.Connected := False;
+      FConexao.Connected := True;
+
+      fqSalvar            := TFDQuery.Create(nil);
+      fqSalvar.Connection := FConexao;
+      fqSalvar.Close;
+      fqSalvar.sql.Clear;
+
+      if i_Operacao = 0 then begin
+        fqSalvar.sql.Add('insert into fazenda ( ' +
+                         '       id,            ' +
+                         '       nome           ' +
+                         ') values (            ' +
+                         '       :p_id,         ' +
+                         '       :p_nome        ' +
+                         ')                     '
+                        );
+        fqSalvar.ParamByName('p_id').AsInteger := Gerar_ID;
+      end else begin
+        fqSalvar.sql.Add('update fazenda set               ' +
+                         '       id              = :p_id,  ' +
+                         '       nome            = :p_nome ' +
+                         '       where id        = :p_id   '
+                        );
+        fqSalvar.ParamByName('p_id').AsInteger := FId_Aluno;
+      end;
+      fqSalvar.ParamByName('p_nome').AsString          := FNome;
+      fqSalvar.ExecSQL;
+
+      Result := True;
+    except
+      on E: Exception do
+         begin
+           s_Erro := E.Message;
+           Result := False;
+         end;
+    end;
+  finally
+    FreeAndNil(fqSalvar);
+  end;
+end;
+
+function TFazenda.Gerar_ID: Integer;
+var
+  fq: TFDQuery;
+begin
+  FConexao.Connected := False;
+  FConexao.Connected := True;
+
+  try
+    fq          := TFDQuery.Create(nil);
+    fq.Connection := FConexao;
+    fq.Close;
+    fq.sql.Clear;
+    fq.sql.Add('select coalesce(max(id), 0) + 1 as id ' +
+               'from fazenda                          '
+              );
+    fq.Open;
+
+    Result := fq.FieldByName('id').AsInteger;
+  finally
+    FreeAndNil(fq);
+  end;
+end;
+
+procedure TFazenda.prc_Deletar(i_id_chave: Integer);
+begin
+  FConexao.Connected := False;
+  FConexao.Connected := True;
+
+  FConexao.ExecSQL('delete from fazenda where id = :id_chave ', [i_id_chave]);
+end;
+
+procedure TFazenda.SetNome(const Value: String);
+begin
+  if Value = EmptyStr then
+    raise EArgumentException.Create('Nome deve ser preenchido.');
+
+  FNome := Value;
+end;
+
+end.

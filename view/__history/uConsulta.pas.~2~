@@ -1,0 +1,52 @@
+unit uConsulta;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Data.DB, Vcl.Grids, Vcl.DBGrids,
+  Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls, clsAluno, dmEscola;
+
+type
+  Tfrm_Consulta = class(TForm)
+    pnl_Consulta: TPanel;
+    lbl_Pesquisar: TLabel;
+    edt_Pesquisar: TEdit;
+    btn_Pesquisar: TBitBtn;
+    dbg_Consulta: TDBGrid;
+    ds_Consulta: TDataSource;
+    procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+    Aluno : TAluno;
+    procedure prc_Consultar;
+  end;
+
+var
+  frm_Consulta: Tfrm_Consulta;
+
+implementation
+
+{$R *.dfm}
+
+{ Tfrm_Consulta }
+
+procedure Tfrm_Consulta.FormCreate(Sender: TObject);
+begin
+  Aluno := TAluno.Create(dm_Escola.FDConnection);
+end;
+
+procedure Tfrm_Consulta.FormDestroy(Sender: TObject);
+begin
+  Aluno.Destroy;
+end;
+
+procedure Tfrm_Consulta.prc_Consultar;
+begin
+  ds_Consulta.DataSet := Aluno.fnc_Consultar(edt_Pesquisar.Text);
+end;
+
+end.

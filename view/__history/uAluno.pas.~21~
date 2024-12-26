@@ -1,0 +1,136 @@
+unit uAluno;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, uPadrao, Vcl.StdCtrls, Vcl.ExtCtrls,
+  Vcl.ComCtrls, clsAluno, dmEscola, Data.DB, Vcl.Grids, Vcl.DBGrids;
+
+type
+  Tfrm_Aluno = class(TFrm_Padrao)
+    lbl_Id: TLabel;
+    edt_Id: TEdit;
+    lbl_Nome: TLabel;
+    edt_Nome: TEdit;
+    lbl_Cpf: TLabel;
+    edt_Cpf: TEdit;
+    lbl_Sexo: TLabel;
+    cb_Sexo: TComboBox;
+    lbl_Dt_Nascimento: TLabel;
+    dtp_Dt_Nascimento: TDateTimePicker;
+    lbl_Email: TLabel;
+    edt_Email: TEdit;
+    lbl_Serie: TLabel;
+    edt_Serie: TEdit;
+    procedure btn_SalvarClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+    procedure dbg_ConsultaDblClick(Sender: TObject);
+    procedure btn_ExcluirClick(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+    Aluno : TAluno;
+    procedure prc_Salvar;
+    procedure prc_Alterar;
+    procedure prc_Excluir;
+    procedure prc_Pesquisar;
+  end;
+
+var
+  frm_Aluno: Tfrm_Aluno;
+
+implementation
+
+{$R *.dfm}
+
+procedure Tfrm_Aluno.btn_ExcluirClick(Sender: TObject);
+begin
+  inherited;
+  prc_Excluir;
+end;
+
+procedure Tfrm_Aluno.btn_SalvarClick(Sender: TObject);
+begin
+  prc_Salvar;
+end;
+
+procedure Tfrm_Aluno.dbg_ConsultaDblClick(Sender: TObject);
+begin
+  inherited;
+  prc_Alterar;
+end;
+
+procedure Tfrm_Aluno.FormCreate(Sender: TObject);
+begin
+  inherited;
+  Aluno := TAluno.Create(dm_Escola.FDConnection);
+end;
+
+procedure Tfrm_Aluno.FormDestroy(Sender: TObject);
+begin
+  inherited;
+  Aluno.Destroy;
+end;
+
+procedure Tfrm_Aluno.FormShow(Sender: TObject);
+begin
+  inherited;
+  prc_Pesquisar;
+end;
+
+procedure Tfrm_Aluno.prc_Alterar;
+begin
+  if not (dbg_Consulta.DataSource.DataSet.IsEmpty) then begin
+    Aluno.Id_Aluno         := dbg_Consulta.DataSource.DataSet.FieldByName('Id').AsInteger;
+
+    edt_Id.Text            := IntToStr(Aluno.Id_Aluno);
+    edt_Nome.Text          := dbg_Consulta.DataSource.DataSet.FieldByName('Nome').AsString;
+    edt_Cpf.Text           := dbg_Consulta.DataSource.DataSet.FieldByName('Cpf').AsString;
+    cb_Sexo.ItemIndex      := cb_Sexo.Items.IndexOf(dbg_Consulta.DataSource.DataSet.FieldByName('Sexo').AsString);
+    dtp_Dt_Nascimento.Date := dbg_Consulta.DataSource.DataSet.FieldByName('Data_Nascimento').AsDateTime;
+    edt_Email.Text         := dbg_Consulta.DataSource.DataSet.FieldByName('Email').AsString;
+    edt_Serie.Text         := dbg_Consulta.DataSource.DataSet.FieldByName('Serie').AsString;
+  end;
+end;
+
+procedure Tfrm_Aluno.prc_Excluir;
+begin
+//
+end;
+
+procedure Tfrm_Aluno.prc_Pesquisar;
+begin
+  ds_Consulta.DataSet := Aluno.fnc_Consultar(edt_Pesquisar.Text);
+end;
+
+procedure Tfrm_Aluno.prc_Salvar;
+var
+  s_Operacao, s_Erro : String;
+begin
+  inherited;
+  try
+    Aluno.Nome            := edt_Nome.Text;
+    Aluno.CPF             := edt_Cpf.Text;
+    Aluno.Sexo            := cb_Sexo.Text;
+    Aluno.Data_Nascimento := dtp_Dt_Nascimento.Date;
+    Aluno.E_mail          := edt_Email.Text;
+    Aluno.Serie           := edt_Serie.Text;
+
+    s_Operacao := 'I';
+    if Aluno.Id_Aluno > 0 then
+      s_Operacao := 'U';
+
+    if Aluno.fnc_Salvar(s_Operacao, s_Erro) then begin
+       Application.MessageBox('Aluno salvo com sucesso!', 'Informação', MB_OK + MB_ICONINFORMATION);
+    end else begin
+       Application.MessageBox(pChar('Erro ao gravar: ' + s_Erro), 'Informação', MB_OK + MB_ICONERROR);
+    end;
+  finally
+  end;
+end;
+
+end.

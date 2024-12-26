@@ -1,0 +1,106 @@
+unit clsCalculo;
+
+interface
+
+uses System.SysUtils, Vcl.Dialogs;
+
+type
+  TCalculo = class
+    private
+      FValor1 : Double;
+      FValor2 : Double;
+      FValor3 : Double;
+      FValor4 : Double;
+    procedure SetValor1(const Value : Double);
+    procedure SetValor2(const Value : Double);
+    procedure SetValor3(const Value : Double);
+    procedure SetValor4(const Value : Double);
+    protected
+    Public
+      property Valor1 : Integer read FValor1 write SetValor1;
+      property Valor2 : Integer read FValor2 write SetValor2;
+      property Valor3 : Integer read FValor3 write SetValor3;
+      property Valor4 : Integer read FValor4 write SetValor4;
+      function Calcular(nValor1, nValor2, nValor3, nValor4 : Double) : String;
+  end;
+
+  TCalculoMedia = class(TCalculo)
+    private
+    protected
+    public
+      function Calcular : String;
+  end;
+
+  TCalculoMaior = class(TCalculo)
+    private
+    protected
+    public
+      function Calcular : String;
+  end;
+
+  TCalculoMenor = class(TCalculo)
+    private
+    protected
+    public
+      function Calcular : String;
+  end;
+
+implementation
+
+{ TCalculo }
+
+procedure TCalculoValor.SetValor1(const Value: Integer);
+begin
+  if Value >= 0 then
+    FValor1 := Value
+  else
+    raise Exception.Create('Valor 1 inválido.');
+end;
+
+procedure TCalculoValor.SetValor2(const Value: Integer);
+begin
+  if Value >= 0 then
+    FValor2 := Value
+  else
+    raise Exception.Create('Valor 2 inválido.');
+end;
+
+procedure TCalculoValor.SetValor3(const Value: Integer);
+begin
+  if Value >= 0 then
+    FValor3 := Value
+  else
+    raise Exception.Create('Valor 3 inválido.');
+end;
+
+procedure TCalculoValor.SetValor4(const Value: Integer);
+begin
+  if Value >= 0 then
+    FValor4 := Value
+  else
+    raise Exception.Create('Valor 4 inválido.');
+end;
+
+
+{ TCalculoMedia }
+
+function TCalculoMedia.Calcular: String;
+begin
+  result := 'Media = ' + IntToStr(FValor1 + FValor2);
+end;
+
+{ TCalculoMaior }
+
+function TCalculoMaior.Calcular: String;
+begin
+  result := 'Maior = ' + IntToStr(FValor1 * FValor2);
+end;
+
+{ TCalculoMenor }
+
+function TCalculoFatorial.Calcular: String;
+begin
+  result := 'Menor = ' + IntToStr(FValor1 * FValor2);
+end;
+
+end.

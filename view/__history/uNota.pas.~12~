@@ -1,0 +1,212 @@
+unit uNota;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, uPadrao, Data.DB, Vcl.Grids,
+  Vcl.DBGrids, Vcl.Buttons, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.ComCtrls, clsNota, dmEscola;
+
+type
+  Tfrm_Nota = class(TFrm_Padrao)
+    lbl_Professor: TLabel;
+    edt_Id_Professor: TEdit;
+    edt_Nome_Professor: TEdit;
+    lbl_Aluno: TLabel;
+    edt_Nome_Aluno: TEdit;
+    edt_Id_Aluno: TEdit;
+    btn_Aluno: TBitBtn;
+    lbl_Ano: TLabel;
+    edt_Ano: TEdit;
+    gb_Notas: TGroupBox;
+    lbl_Nota1: TLabel;
+    edt_Nota1: TEdit;
+    lbl_Nota2: TLabel;
+    edt_Nota2: TEdit;
+    lbl_Nota3: TLabel;
+    edt_Nota3: TEdit;
+    lbl_Nota4: TLabel;
+    edt_Nota4: TEdit;
+    procedure FormShow(Sender: TObject);
+    procedure btn_PesquisarClick(Sender: TObject);
+    procedure btn_NovoClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
+    procedure dbg_ConsultaDblClick(Sender: TObject);
+    procedure btn_AlunoClick(Sender: TObject);
+    procedure btn_SalvarClick(Sender: TObject);
+    procedure btn_CancelarClick(Sender: TObject);
+    procedure btn_ExcluirClick(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    Nota             : TNota;
+    i_Id_Professor   : Integer;
+    s_Nome_Professor : String;
+    procedure prc_Salvar;
+    procedure prc_Alterar;
+    procedure prc_Excluir;
+    procedure prc_Pesquisar;
+    procedure prc_Novo;
+    { Public declarations }
+  end;
+
+var
+  frm_Nota: Tfrm_Nota;
+
+implementation
+
+{$R *.dfm}
+
+uses uConsulta;
+
+procedure Tfrm_Nota.btn_AlunoClick(Sender: TObject);
+begin
+  inherited;
+  frm_Consulta := Tfrm_Consulta.Create(Application);
+  try
+    frm_Consulta.ShowModal;
+    edt_Id_Aluno.Text   := IntToStr(frm_Consulta.i_Id_aluno);
+    edt_Nome_Aluno.Text := frm_Consulta.s_Nome_Aluno;
+    edt_Ano.SetFocus;
+  finally
+    frm_Consulta.Free;
+  end;
+end;
+
+procedure Tfrm_Nota.btn_CancelarClick(Sender: TObject);
+begin
+  inherited;
+  prc_Cancelar;
+end;
+
+procedure Tfrm_Nota.btn_ExcluirClick(Sender: TObject);
+begin
+  prc_Excluir;
+  inherited;
+end;
+
+procedure Tfrm_Nota.btn_NovoClick(Sender: TObject);
+begin
+  inherited;
+  prc_Novo;
+end;
+
+procedure Tfrm_Nota.btn_PesquisarClick(Sender: TObject);
+begin
+  inherited;
+  prc_Pesquisar;
+end;
+
+procedure Tfrm_Nota.btn_SalvarClick(Sender: TObject);
+begin
+  inherited;
+  prc_Salvar;
+end;
+
+procedure Tfrm_Nota.dbg_ConsultaDblClick(Sender: TObject);
+begin
+  inherited;
+  prc_Alterar;
+end;
+
+procedure Tfrm_Nota.FormCreate(Sender: TObject);
+begin
+  inherited;
+  Nota := TNota.Create(dm_Escola.FDConnection);
+end;
+
+procedure Tfrm_Nota.FormDestroy(Sender: TObject);
+begin
+  inherited;
+  Nota.Destroy;
+end;
+
+procedure Tfrm_Nota.FormShow(Sender: TObject);
+begin
+  inherited;
+  prc_Pesquisar;
+end;
+
+procedure Tfrm_Nota.prc_Alterar;
+begin
+  if not (dbg_Consulta.DataSource.DataSet.IsEmpty) then begin
+    Nota.Id_Professor := dbg_Consulta.DataSource.DataSet.FieldByName('Id_Professor').AsInteger;
+    Nota.Id_Aluno     := dbg_Consulta.DataSource.DataSet.FieldByName('Id_Aluno').AsInteger;
+    Nota.Ano          := dbg_Consulta.DataSource.DataSet.FieldByName('Ano').AsInteger;
+
+    edt_Id_Professor.Text   := IntToStr(Nota.Id_Professor);
+    edt_Nome_Professor.Text := dbg_Consulta.DataSource.DataSet.FieldByName('Professor').AsString;
+    edt_Id_Aluno.Text       := IntToStr(Nota.Id_Aluno);
+    edt_Nome_aluno.Text     := dbg_Consulta.DataSource.DataSet.FieldByName('Aluno').AsString;
+    edt_Ano.Text            := IntToStr(Nota.Ano);
+    edt_Nota1.Text          := FloatToStr(dbg_Consulta.DataSource.DataSet.FieldByName('Nota_1').AsFloat);
+    edt_Nota2.Text          := FloatToStr(dbg_Consulta.DataSource.DataSet.FieldByName('Nota_2').AsFloat);
+    edt_Nota3.Text          := FloatToStr(dbg_Consulta.DataSource.DataSet.FieldByName('Nota_3').AsFloat);
+    edt_Nota4.Text          := FloatToStr(dbg_Consulta.DataSource.DataSet.FieldByName('Nota_4').AsFloat);
+  end;
+end;
+
+procedure Tfrm_Nota.prc_Excluir;
+begin
+  if Application.MessageBox('Deseja excluir o registro?', 'Confirmação', mb_YesNo + mb_IconInformation + mb_DefButton2) = mrYes then begin
+    Nota.prc_Deletar(Nota.Id_Professor, Nota.Id_Aluno, Nota.Ano);
+    Application.MessageBox('Nota excluída com sucesso!', 'Informação', MB_OK + MB_ICONINFORMATION);
+    prc_Pesquisar;
+    prc_Cancelar;
+  end;
+end;
+
+procedure Tfrm_Nota.prc_Novo;
+begin
+  edt_Id_Professor.Text   := IntToStr(i_Id_Professor);
+  edt_Nome_Professor.Text := s_Nome_Professor;
+  edt_Ano.Text            := FormatDateTime('YYYY', date);
+  edt_Id_Aluno.Clear;
+  edt_Nome_Aluno.Clear;
+  edt_Nota1.Clear;
+  edt_Nota2.Clear;
+  edt_Nota3.Clear;
+  edt_Nota4.Clear;
+  btn_Aluno.SetFocus;
+end;
+
+procedure Tfrm_Nota.prc_Pesquisar;
+begin
+  ds_Consulta.DataSet := Nota.fnc_Consultar(edt_Pesquisar.Text);
+end;
+
+procedure Tfrm_Nota.prc_Salvar;
+var
+  i_Operacao : Integer;
+  s_Erro     : String;
+begin
+  inherited;
+  try
+    with Nota do begin
+      Id_Professor := StrToInt(edt_Id_Professor.Text);
+      Id_Aluno     := StrToInt(edt_Id_Aluno.Text);
+      Ano          := StrToInt(edt_Ano.Text);
+      Nota_1       := StrToFloat(edt_Nota1.Text);
+      Nota_2       := StrToFloat(edt_Nota2.Text);
+      Nota_3       := StrToFloat(edt_Nota3.Text);
+      Nota_4       := StrToFloat(edt_Nota4.Text);
+    end;
+
+    case FOperacao of
+      opNovo    : i_Operacao := 0;
+      opAlterar : i_Operacao := 1;
+    end;
+
+    if Nota.fnc_Salvar(i_Operacao, s_Erro) then begin
+       Application.MessageBox('Nota lançada salvo com sucesso!', 'Informação', MB_OK + MB_ICONINFORMATION);
+       prc_Cancelar;
+       prc_Pesquisar;
+    end else begin
+       Application.MessageBox(pChar('Erro ao gravar: ' + s_Erro), 'Informação', MB_OK + MB_ICONERROR);
+    end;
+  finally
+  end;
+end;
+
+end.

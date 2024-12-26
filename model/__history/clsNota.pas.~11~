@@ -1,0 +1,270 @@
+unit clsNota;
+
+interface
+
+Uses
+  System.SysUtils, FireDAC.Comp.Client;
+
+Type
+  TNota = Class
+  private
+    FConexao         : TFDConnection;
+    FId_Professor    : Integer;
+    FId_Aluno        : Integer;
+    FAno             : Integer;
+    FNota_1          : Double;
+    FNota_2          : Double;
+    FNota_3          : Double;
+    FNota_4          : Double;
+    procedure SetId_Aluno(const Value: Integer);
+    procedure SetAno(const Value: Integer);
+    procedure SetNota_1(const Value: Double);
+    procedure SetNota_2(const Value: Double);
+    procedure SetNota_3(const Value: Double);
+    procedure SetNota_4(const Value: Double);
+  public
+    property Conexao         : TFDConnection read FConexao         write FConexao;
+    property Id_Professor    : Integer       read FId_Professor    write FId_Professor;
+    property Id_Aluno        : Integer       read FId_Aluno        write SetId_Aluno;
+    property Ano             : Integer       read FAno             write SetAno;
+    property Nota_1          : Double        read FNota_1          write SetNota_1;
+    property Nota_2          : Double        read FNota_2          write SetNota_2;
+    property Nota_3          : Double        read FNota_3          write SetNota_3;
+    property Nota_4          : Double        read FNota_4          write SetNota_4;
+
+    constructor Create(Conexao : TFDConnection);
+    destructor Destroy; Override;
+
+    function fnc_Salvar(i_Operacao : Integer; out s_Erro : String) : boolean;
+    function fnc_Consultar(s_Texto : String) : TFDQuery;
+    procedure prc_Deletar(i_id_professor, i_id_aluno, i_ano : Integer);
+    function fnc_Alunos(i_id_professor : Integer) : TFDQuery;
+  End;
+
+var
+  fqConsultar : TFDQuery;
+
+implementation
+
+{ TAluno }
+
+uses dmEscola;
+
+constructor TNota.Create(Conexao: TFDConnection);
+begin
+  FConexao               := Conexao;
+  fqConsultar            := TFDQuery.Create(nil);
+  fqConsultar.Connection := FConexao;
+end;
+
+destructor TNota.Destroy;
+begin
+  fqConsultar.Destroy;
+  inherited;
+end;
+
+function TNota.fnc_Alunos(i_id_professor: Integer): TFDQuery;
+begin
+  try
+    FConexao.Connected := False;
+    FConexao.Connected := True;
+
+    fqConsultar.Close;
+    fqConsultar.sql.Clear;
+    fqConsultar.sql.Add('select n.id_professor,                 ' +
+                        '       p.nome as professor,            ' +
+                        '       n.id_aluno,                     ' +
+                        '       a.nome as aluno,                ' +
+                        '       n.ano,                          ' +
+                        '       n.nota_1,                       ' +
+                        '       n.nota_2,                       ' +
+                        '       n.nota_3,                       ' +
+                        '       n.nota_4                        ' +
+                        ' from nota n                           ' +
+                        ' inner join professor p                ' +
+                        '    on p.id = n.id_professor           ' +
+                        ' inner join aluno a                    ' +
+                        '    on a.id = n.id_aluno               ' +
+                        'where n.id_professor = :p_id_professor '
+                        );
+    fqConsultar.ParamByName('p_id_professor').AsInteger := i_id_professor;
+    fqConsultar.Open;
+  finally
+    Result := fqConsultar;
+  end;
+end;
+
+function TNota.fnc_Consultar(s_Texto: String): TFDQuery;
+begin
+  try
+    FConexao.Connected := False;
+    FConexao.Connected := True;
+
+    fqConsultar.Close;
+    fqConsultar.sql.Clear;
+    fqConsultar.sql.Add('select n.id_professor,        ' +
+                        '       p.nome as professor,   ' +
+                        '       n.id_aluno,            ' +
+                        '       a.nome as aluno,       ' +
+                        '       n.ano,                 ' +
+                        '       n.nota_1,              ' +
+                        '       n.nota_2,              ' +
+                        '       n.nota_3,              ' +
+                        '       n.nota_4               ' +
+                        ' from nota n                  ' +
+                        ' inner join professor p       ' +
+                        '    on p.id = n.id_professor  ' +
+                        ' inner join aluno a           ' +
+                        '    on a.id = n.id_aluno      ' +
+                        'where (p.nome like :p_texto)  ' +
+                        '   or (a.nome like :p_texto)  '
+                        );
+    fqConsultar.ParamByName('p_Texto').AsString := '%' + s_Texto + '%';
+    fqConsultar.Open;
+  finally
+    Result := fqConsultar;
+  end;
+end;
+
+function TNota.fnc_Salvar(i_Operacao: Integer; out s_Erro: String): boolean;
+var
+  fqSalvar: TFDQuery;
+begin
+  try
+    try
+      FConexao.Connected := False;
+      FConexao.Connected := True;
+
+      fqSalvar            := TFDQuery.Create(nil);
+      fqSalvar.Connection := FConexao;
+      fqSalvar.Close;
+      fqSalvar.sql.Clear;
+
+      if i_Operacao = 0 then begin
+        fqSalvar.sql.Add('insert into nota (             ' +
+                         '       id_professor,           ' +
+                         '       id_aluno,               ' +
+                         '       ano,                    ' +
+                         '       nota_1,                 ' +
+                         '       nota_2,                 ' +
+                         '       nota_3,                 ' +
+                         '       nota_4                  ' +
+                         ') values (                     ' +
+                         '       :p_id_professor,        ' +
+                         '       :p_id_aluno,            ' +
+                         '       :p_ano,                 ' +
+                         '       :p_nota_1,              ' +
+                         '       :p_nota_2,              ' +
+                         '       :p_nota_3,              ' +
+                         '       :p_nota_4               ' +
+                         ')                              '
+                        );
+      end else begin
+        fqSalvar.sql.Add('update nota set                              ' +
+                         '       nota_1 = :p_nota_1,                   ' +
+                         '       nota_2 = :p_nota_2,                   ' +
+                         '       nota_3 = :p_nota_3,                   ' +
+                         '       nota_4 = :p_nota_4                    ' +
+                         '       where id_professor  = :p_id_professor ' +
+                         '         and id_aluno      = :p_id_aluno     ' +
+                         '         and ano           = :p_ano          '
+                        );
+      end;
+      fqSalvar.ParamByName('p_id_professor').AsInteger := FId_Professor;
+      fqSalvar.ParamByName('p_id_aluno').AsInteger     := FId_Aluno;
+      fqSalvar.ParamByName('p_ano').AsInteger          := FAno;
+      fqSalvar.ParamByName('p_nota_1').AsFloat         := FNota_1;
+      fqSalvar.ParamByName('p_nota_2').AsFloat         := FNota_2;
+      fqSalvar.ParamByName('p_nota_3').AsFloat         := FNota_3;
+      fqSalvar.ParamByName('p_nota_4').AsFloat         := FNota_4;
+      fqSalvar.ExecSQL;
+
+      Result := True;
+    except
+      on E: Exception do
+         begin
+           s_Erro := E.Message;
+           Result := False;
+         end;
+    end;
+  finally
+    FreeAndNil(fqSalvar);
+  end;
+end;
+
+procedure TNota.prc_Deletar(i_id_professor, i_id_aluno, i_ano: Integer);
+var
+  fqDeletar: TFDQuery;
+begin
+  try
+    FConexao.Connected := False;
+    FConexao.Connected := True;
+
+    fqDeletar            := TFDQuery.Create(nil);
+    fqDeletar.Connection := FConexao;
+    fqDeletar.Close;
+    fqDeletar.sql.Clear;
+
+    fqDeletar.sql.Add('delete from nota                    ' +
+                      ' where id_professor = :id_professor ' +
+                      '   and id_aluno     = :id_aluno     ' +
+                      '   and ano          = :ano          '
+                     );
+    fqDeletar.ParamByName('id_professor').AsInteger := i_id_professor;
+    fqDeletar.ParamByName('id_aluno').AsInteger     := i_id_aluno;
+    fqDeletar.ParamByName('ano').AsInteger          := i_ano;
+    fqDeletar.ExecSQL;
+  finally
+    FreeAndNil(fqDeletar);
+  end;
+end;
+
+procedure TNota.SetAno(const Value: Integer);
+begin
+  if Value <= 0 then
+    raise EArgumentException.Create('Informe um ano válido.');
+
+  FAno := Value;
+end;
+
+procedure TNota.SetId_Aluno(const Value: Integer);
+begin
+  if Value <= 0 then
+    raise EArgumentException.Create('Informe um Aluno.');
+
+  FID_Aluno := Value;
+end;
+
+procedure TNota.SetNota_1(const Value: Double);
+begin
+  if (Value < 0) or (Value > 10) then
+    raise EArgumentException.Create('Informe uma nota entre 0 e 10.');
+
+  FNota_1 := Value;
+end;
+
+procedure TNota.SetNota_2(const Value: Double);
+begin
+  if (Value < 0) or (Value > 10) then
+    raise EArgumentException.Create('Informe uma nota entre 0 e 10.');
+
+  FNota_2 := Value;
+end;
+
+procedure TNota.SetNota_3(const Value: Double);
+begin
+  if (Value < 0) or (Value > 10) then
+    raise EArgumentException.Create('Informe uma nota entre 0 e 10.');
+
+  FNota_3 := Value;
+end;
+
+procedure TNota.SetNota_4(const Value: Double);
+begin
+  if (Value < 0) or (Value > 10) then
+    raise EArgumentException.Create('Informe uma nota entre 0 e 10.');
+
+  FNota_4 := Value;
+end;
+
+end.

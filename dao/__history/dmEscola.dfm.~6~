@@ -1,0 +1,39 @@
+object dm_Escola: Tdm_Escola
+  OldCreateOrder = False
+  Height = 220
+  Width = 266
+  object FDConnection: TFDConnection
+    Params.Strings = (
+      'Database=D:\Projetos\Escola\db\ESCOLA.FDB'
+      'User_Name=SYSDBA'
+      'Password=masterkey'
+      'Server=LocalHost'
+      'Port=3050'
+      'CharacterSet=win1252'
+      'DriverID=FB')
+    Connected = True
+    LoginPrompt = False
+    Left = 48
+    Top = 16
+  end
+  object FDTransaction: TFDTransaction
+    Connection = FDConnection
+    Left = 48
+    Top = 64
+  end
+  object fdQuery: TFDQuery
+    Connection = FDConnection
+    Left = 136
+    Top = 16
+  end
+  object FDGUIxWaitCursor: TFDGUIxWaitCursor
+    Provider = 'Forms'
+    Left = 48
+    Top = 112
+  end
+  object FDPhysFBDriverLink: TFDPhysFBDriverLink
+    VendorLib = 'C:\Windows\System32\FBCLIENT.DLL'
+    Left = 48
+    Top = 160
+  end
+end

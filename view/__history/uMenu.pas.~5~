@@ -1,0 +1,55 @@
+unit uMenu;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Menus, System.Actions, Vcl.ActnList;
+
+type
+  Tfrm_Menu = class(TForm)
+    m_Menu: TMainMenu;
+    Cadastro: TMenuItem;
+    Fazenda: TMenuItem;
+    Animal: TMenuItem;
+    acl_Menu: TActionList;
+    acl_Fazenda: TAction;
+    acl_Animal: TAction;
+    procedure acl_FazendaExecute(Sender: TObject);
+    procedure acl_AnimalExecute(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frm_Menu: Tfrm_Menu;
+
+implementation
+
+{$R *.dfm}
+
+uses uAluno, uProfessor;
+
+procedure Tfrm_Menu.acl_FazendaExecute(Sender: TObject);
+begin
+  frm_Aluno := Tfrm_Aluno.Create(Application);
+  try
+    frm_Aluno.ShowModal;
+  finally
+    frm_Aluno.Free;
+  end;
+end;
+
+procedure Tfrm_Menu.acl_AnimalExecute(Sender: TObject);
+begin
+  frm_Professor := Tfrm_Professor.Create(Application);
+  try
+    frm_Professor.ShowModal;
+  finally
+    frm_Professor.Free;
+  end;
+end;
+
+end.

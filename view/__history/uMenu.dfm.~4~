@@ -1,0 +1,48 @@
+object frm_Menu: Tfrm_Menu
+  Left = 0
+  Top = 0
+  Caption = 'Menu'
+  ClientHeight = 201
+  ClientWidth = 447
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  Menu = m_Menu
+  OldCreateOrder = False
+  PixelsPerInch = 96
+  TextHeight = 13
+  object m_Menu: TMainMenu
+    Left = 16
+    Top = 8
+    object Cadastro1: TMenuItem
+      Caption = 'Cadastro'
+      object Aluno1: TMenuItem
+        Action = acl_Aluno
+      end
+      object Professor1: TMenuItem
+        Caption = 'Professor'
+      end
+      object Notas1: TMenuItem
+        Caption = 'Notas'
+      end
+    end
+  end
+  object acl_Menu: TActionList
+    Left = 16
+    Top = 56
+    object acl_Aluno: TAction
+      Caption = 'Aluno'
+      OnExecute = acl_AlunoExecute
+    end
+    object acl_Professor: TAction
+      Caption = 'Professor'
+      OnExecute = acl_ProfessorExecute
+    end
+    object acl_Notas: TAction
+      Caption = 'Notas'
+    end
+  end
+end

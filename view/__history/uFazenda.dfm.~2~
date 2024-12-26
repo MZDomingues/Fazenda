@@ -1,0 +1,168 @@
+inherited frm_Aluno: Tfrm_Aluno
+  ActiveControl = nil
+  Caption = 'Cadastro de Alunos'
+  ClientHeight = 274
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  ExplicitHeight = 313
+  PixelsPerInch = 96
+  TextHeight = 13
+  inherited pc_Padrao: TPageControl
+    Height = 274
+    ExplicitHeight = 274
+    inherited ts_Consulta: TTabSheet
+      ExplicitHeight = 246
+      inherited dbg_Consulta: TDBGrid
+        Height = 199
+        Columns = <
+          item
+            Expanded = False
+            FieldName = 'id'
+            Title.Caption = 'ID'
+            Width = 40
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'Nome'
+            Title.Caption = 'Aluno'
+            Width = 200
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'Serie'
+            Title.Caption = 'S'#233'rie'
+            Width = 70
+            Visible = True
+          end>
+      end
+    end
+    inherited ts_Dados: TTabSheet
+      ExplicitHeight = 246
+      object lbl_Id: TLabel [0]
+        Left = 22
+        Top = 16
+        Width = 11
+        Height = 13
+        Caption = 'ID'
+      end
+      object lbl_Nome: TLabel [1]
+        Left = 6
+        Top = 43
+        Width = 27
+        Height = 13
+        Caption = 'Nome'
+      end
+      object lbl_Cpf: TLabel [2]
+        Left = 14
+        Top = 73
+        Width = 19
+        Height = 13
+        Caption = 'CPF'
+      end
+      object lbl_Sexo: TLabel [3]
+        Left = 154
+        Top = 73
+        Width = 24
+        Height = 13
+        Caption = 'Sexo'
+      end
+      object lbl_Dt_Nascimento: TLabel [4]
+        Left = 271
+        Top = 73
+        Width = 81
+        Height = 13
+        Caption = 'Data Nascimento'
+      end
+      object lbl_Email: TLabel [5]
+        Left = 5
+        Top = 97
+        Width = 28
+        Height = 13
+        Caption = 'E-Mail'
+      end
+      object lbl_Serie: TLabel [6]
+        Left = 328
+        Top = 97
+        Width = 24
+        Height = 13
+        Caption = 'S'#233'rie'
+      end
+      inherited pnl_Botoes: TPanel
+        Top = 205
+        ExplicitTop = 205
+        inherited btn_Salvar: TButton
+          OnClick = btn_SalvarClick
+        end
+      end
+      object edt_Id: TEdit
+        Left = 39
+        Top = 13
+        Width = 42
+        Height = 21
+        Enabled = False
+        NumbersOnly = True
+        TabOrder = 1
+      end
+      object edt_Nome: TEdit
+        Left = 39
+        Top = 40
+        Width = 416
+        Height = 21
+        CharCase = ecUpperCase
+        MaxLength = 100
+        TabOrder = 2
+      end
+      object edt_Cpf: TEdit
+        Left = 39
+        Top = 67
+        Width = 90
+        Height = 21
+        MaxLength = 11
+        NumbersOnly = True
+        TabOrder = 3
+      end
+      object cb_Sexo: TComboBox
+        Left = 184
+        Top = 67
+        Width = 73
+        Height = 21
+        Style = csDropDownList
+        ItemIndex = 0
+        TabOrder = 4
+        Text = 'Masculino'
+        Items.Strings = (
+          'Masculino'
+          'Feminino')
+      end
+      object dtp_Dt_Nascimento: TDateTimePicker
+        Left = 358
+        Top = 67
+        Width = 97
+        Height = 21
+        Date = 45024.011052071760000000
+        Time = 45024.011052071760000000
+        TabOrder = 5
+      end
+      object edt_Email: TEdit
+        Left = 39
+        Top = 94
+        Width = 218
+        Height = 21
+        CharCase = ecLowerCase
+        MaxLength = 50
+        TabOrder = 6
+      end
+      object edt_Serie: TEdit
+        Left = 358
+        Top = 94
+        Width = 97
+        Height = 21
+        CharCase = ecUpperCase
+        MaxLength = 15
+        TabOrder = 7
+      end
+    end
+  end
+end

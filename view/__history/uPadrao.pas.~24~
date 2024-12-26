@@ -1,0 +1,142 @@
+unit uPadrao;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.StdCtrls, Vcl.ComCtrls,
+  Data.DB, Vcl.Grids, Vcl.DBGrids, Vcl.Buttons;
+
+type
+  TOperacao = (opNovo, opAlterar, opNavegar);
+
+  TFrm_Padrao = class(TForm)
+    pc_Padrao: TPageControl;
+    ts_Consulta: TTabSheet;
+    ts_Dados: TTabSheet;
+    pnl_Consulta: TPanel;
+    Label1: TLabel;
+    edt_Pesquisar: TEdit;
+    btn_Novo: TButton;
+    dbg_Consulta: TDBGrid;
+    ds_Consulta: TDataSource;
+    pnl_Botoes: TPanel;
+    btn_Salvar: TButton;
+    btn_Cancelar: TButton;
+    btn_Imprimir: TButton;
+    btn_Pesquisar: TBitBtn;
+    Button1: TButton;
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure btn_NovoClick(Sender: TObject);
+    procedure btn_CancelarClick(Sender: TObject);
+    procedure btn_ImprimirClick(Sender: TObject);
+    procedure FormKeyPress(Sender: TObject; var Key: Char);
+    procedure FormShow(Sender: TObject);
+    procedure dbg_ConsultaDblClick(Sender: TObject);
+    procedure btn_PesquisarClick(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+    FOperacao : TOperacao;
+    procedure prc_Novo;
+    procedure prc_Alterar;
+    procedure prc_Cancelar;
+    procedure prc_Pesquisar;
+    procedure prc_Config;
+    procedure prc_Imprimir;
+  end;
+
+var
+  Frm_Padrao: TFrm_Padrao;
+
+implementation
+
+{$R *.dfm}
+
+procedure TFrm_Padrao.btn_CancelarClick(Sender: TObject);
+begin
+  prc_Cancelar;
+end;
+
+procedure TFrm_Padrao.btn_ImprimirClick(Sender: TObject);
+begin
+  prc_Imprimir;
+end;
+
+procedure TFrm_Padrao.btn_NovoClick(Sender: TObject);
+begin
+  prc_Novo;
+end;
+
+procedure TFrm_Padrao.btn_PesquisarClick(Sender: TObject);
+begin
+  prc_pesquisar;
+end;
+
+procedure TFrm_Padrao.dbg_ConsultaDblClick(Sender: TObject);
+begin
+  prc_Alterar;
+end;
+
+procedure TFrm_Padrao.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = VK_ESCAPE then begin
+    if Application.MessageBox('Deseja realmente sair?', 'Confirmação', mb_YesNo + mb_IconInformation + mb_DefButton2) = mrYes then
+      Close;
+  end;
+end;
+
+procedure TFrm_Padrao.FormKeyPress(Sender: TObject; var Key: Char);
+begin
+  if Key = #13 then begin
+    Key := #0;
+    Perform(WM_NEXTDLGCTL, 0 ,0);
+  end;
+end;
+
+procedure TFrm_Padrao.FormShow(Sender: TObject);
+begin
+  prc_Config;
+end;
+
+procedure TFrm_Padrao.prc_Alterar;
+begin
+  FOperacao            := opAlterar;
+  pc_Padrao.ActivePage := ts_Dados;
+  btn_Excluir.Enabled  := True;
+end;
+
+procedure TFrm_Padrao.prc_Cancelar;
+begin
+  FOperacao            := opNavegar;
+  pc_Padrao.ActivePage := ts_Consulta;
+  prc_Pesquisar;
+end;
+
+procedure TFrm_Padrao.prc_Config;
+begin
+  ts_Consulta.TabVisible  := False;
+  ts_Dados.TabVisible     := False;
+  pc_Padrao.ActivePage    := ts_Consulta;
+end;
+
+procedure TFrm_Padrao.prc_Imprimir;
+begin
+
+end;
+
+procedure TFrm_Padrao.prc_Novo;
+begin
+  FOperacao            := opNovo;
+  pc_Padrao.ActivePage := ts_Dados;
+  btn_Excluir.Enabled  := False;
+end;
+
+procedure TFrm_Padrao.prc_Pesquisar;
+begin
+
+end;
+
+end.

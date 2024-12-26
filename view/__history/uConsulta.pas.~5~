@@ -1,0 +1,69 @@
+unit uConsulta;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Data.DB, Vcl.Grids, Vcl.DBGrids,
+  Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls, clsAluno, dmEscola;
+
+type
+  Tfrm_Consulta = class(TForm)
+    pnl_Consulta: TPanel;
+    lbl_Pesquisar: TLabel;
+    edt_Pesquisar: TEdit;
+    btn_Pesquisar: TBitBtn;
+    dbg_Consulta: TDBGrid;
+    ds_Consulta: TDataSource;
+    procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
+    procedure btn_PesquisarClick(Sender: TObject);
+    procedure dbg_ConsultaDblClick(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+    Aluno : TAluno;
+    i_Id_Aluno   : Integer;
+    s_Nome_Aluno : String;
+    procedure prc_Consultar;
+  end;
+
+var
+  frm_Consulta: Tfrm_Consulta;
+
+implementation
+
+{$R *.dfm}
+
+{ Tfrm_Consulta }
+
+procedure Tfrm_Consulta.btn_PesquisarClick(Sender: TObject);
+begin
+  prc_Consultar;
+end;
+
+procedure Tfrm_Consulta.dbg_ConsultaDblClick(Sender: TObject);
+begin
+  if not (dbg_Consulta.DataSource.DataSet.IsEmpty) then begin
+    i_Id_Aluno   := dbg_Consulta.DataSource.DataSet.FieldByName('id').AsInteger;
+    s_Nome_Aluno := dbg_Consulta.DataSource.DataSet.FieldByName('Nome').AsString;
+  end;
+end;
+
+procedure Tfrm_Consulta.FormCreate(Sender: TObject);
+begin
+  Aluno := TAluno.Create(dm_Escola.FDConnection);
+end;
+
+procedure Tfrm_Consulta.FormDestroy(Sender: TObject);
+begin
+  Aluno.Destroy;
+end;
+
+procedure Tfrm_Consulta.prc_Consultar;
+begin
+  ds_Consulta.DataSet := Aluno.fnc_Consultar(edt_Pesquisar.Text);
+end;
+
+end.

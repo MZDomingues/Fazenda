@@ -1,0 +1,92 @@
+unit uNota;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, uPadrao, Data.DB, Vcl.Grids,
+  Vcl.DBGrids, Vcl.Buttons, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.ComCtrls;
+
+type
+  Tfrm_Nota = class(TFrm_Padrao)
+    lbl_Professor: TLabel;
+    edt_Id_Professor: TEdit;
+    edt_Nome_Professor: TEdit;
+    lbl_Aluno: TLabel;
+    edt_Nome_Aluno: TEdit;
+    edt_Id_Aluno: TEdit;
+    btn_Aluno: TBitBtn;
+    lbl_Ano: TLabel;
+    edt_Ano: TEdit;
+    gb_Notas: TGroupBox;
+    lbl_Nota1: TLabel;
+    edt_Nota1: TEdit;
+    lbl_Nota2: TLabel;
+    edt_Nota2: TEdit;
+    lbl_Nota3: TLabel;
+    edt_Nota3: TEdit;
+    lbl_Nota4: TLabel;
+    edt_Nota4: TEdit;
+    procedure FormShow(Sender: TObject);
+    procedure btn_PesquisarClick(Sender: TObject);
+    procedure btn_NovoClick(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    i_Id_Professor   : Integer;
+    s_Nome_Professor : String;
+    procedure prc_Novo;
+    { Public declarations }
+  end;
+
+var
+  frm_Nota: Tfrm_Nota;
+
+implementation
+
+{$R *.dfm}
+
+uses uConsulta;
+
+procedure Tfrm_Nota.btn_NovoClick(Sender: TObject);
+begin
+  inherited;
+  prc_Novo;
+end;
+
+procedure Tfrm_Nota.btn_PesquisarClick(Sender: TObject);
+begin
+  inherited;
+  frm_Consulta := Tfrm_Consulta.Create(Application);
+  try
+    frm_Consulta.ShowModal;
+    edt_Id_Aluno.Text   := IntToStr(frm_Consulta.i_Id_aluno);
+    edt_Nome_Aluno.Text := frm_Consulta.s_Nome_Aluno;
+    edt_Ano.SetFocus;
+  finally
+    frm_Consulta.Free;
+  end;
+
+end;
+
+procedure Tfrm_Nota.FormShow(Sender: TObject);
+begin
+  inherited;
+  //prc_Pesquisar;
+end;
+
+procedure Tfrm_Nota.prc_Novo;
+begin
+  edt_Id_Professor.Text   := IntToStr(i_Id_Professor);
+  edt_Nome_Professor.Text := s_Nome_Professor;
+  edt_Ano.Text            := FormatDateTime('YYYY', date);
+  edt_Id_Aluno.Clear;
+  edt_Nome_Aluno.Clear;
+  edt_Nota1.Clear;
+  edt_Nota2.Clear;
+  edt_Nota3.Clear;
+  edt_Nota4.Clear;
+  btn_Aluno.SetFocus;
+end;
+
+end.

@@ -1,0 +1,168 @@
+unit clsProfessor;
+
+interface
+
+Uses
+  System.SysUtils, FireDAC.Comp.Client;
+
+Type
+  TProfessor = Class
+  private
+    FConexao         : TFDConnection;
+    FId_Professor    : Integer;
+    FNome            : String;
+    FCPF             : String;
+    FSexo            : String;
+    FData_Nascimento : TDate;
+    FE_mail          : String;
+    FDisciplinia     : String;
+    procedure SetNome(const Value: String);
+    function Salvar: boolean;
+  public
+    property Conexao         : TFDConnection read FConexao         write FConexao;
+    property Id_Professor    : Integer       read FId_Professor    write FId_Professor;
+    property Nome            : String        read FNome            write SetNome;
+    property CPF             : String        read FCPF             write FCPF;
+    property Sexo            : String        read FSexo            write FSexo;
+    property Data_Nascimento : TDate         read FData_Nascimento write FData_Nascimento;
+    property E_mail          : String        read FE_mail          write FE_mail;
+    property Disciplinia     : String        read FDisciplinia     write FDisciplinia;
+
+    constructor Create(Conexao : TFDConnection);
+    destructor Destroy; Override;
+
+    function Gerar_ID() : Integer;
+    function fnc_Salvar(s_TpOperacao : String; out s_Erro : String) : boolean;
+    procedure prc_Deletar(i_id_chave : Integer);
+  End;
+
+var
+  fq: TFDQuery;
+
+implementation
+
+{ TProfessor }
+
+uses dmEscola;
+
+constructor TProfessor.Create(Conexao: TFDConnection);
+begin
+  FConexao      := Conexao;
+
+//  fq            := TFDQuery.Create(nil);
+//  fq.Connection := FConexao;
+end;
+
+destructor TProfessor.Destroy;
+begin
+  fq.Destroy;
+  inherited;
+end;
+
+function TProfessor.fnc_Salvar(s_TpOperacao: String; out s_Erro: String): boolean;
+begin
+  try
+    try
+      FConexao.Connected := False;
+      FConexao.Connected := True;
+
+      fq            := TFDQuery.Create(nil);
+      fq.Connection := FConexao;
+      fq.Close;
+      fq.sql.Clear;
+
+      if s_TpOperacao = 'I' then begin
+        fq.sql.Add('insert into professor (        ' +
+                   '       id,                     ' +
+                   '       nome,                   ' +
+                   '       cpf,                    ' +
+                   '       sexo,                   ' +
+                   '       data_nascimento,        ' +
+                   '       email,                  ' +
+                   '       disciplina              ' +
+                   ') values (                     ' +
+                   '       :p_id,                  ' +
+                   '       :p_nome,                ' +
+                   '       :p_cpf,                 ' +
+                   '       :p_sexo,                ' +
+                   '       :p_data_nascimento,     ' +
+                   '       :p_email,               ' +
+                   '       :p_disciplina           ' +
+                   ')                              ');
+        fq.ParamByName('p_id').AsInteger := 1;// Gerar_ID;
+      end else begin
+        fq.sql.Add('update professor set                         ' +
+                   '       id              = :p_id,              ' +
+                   '       nome            = :p_nome,            ' +
+                   '       cpf             = :p_cpf,             ' +
+                   '       sexo            = :p_sexo,            ' +
+                   '       data_nascimento = :p_data_nascimento, ' +
+                   '       email           = :p_email,           ' +
+                   '       disciplina      = :p_disciplina       ' +
+                   '       where id        = :p_id               ');
+        fq.ParamByName('p_id').AsInteger := FId_Professor;
+      end;
+      fq.ParamByName('p_nome').AsString          := FNome;
+      fq.ParamByName('p_cpf').AsString           := FCPF;
+      fq.ParamByName('p_sexo').AsString          := FSexo;
+      fq.ParamByName('p_data_nascimento').AsDate := FData_Nascimento;
+      fq.ParamByName('p_email').AsString         := FE_mail;
+      fq.ParamByName('p_disciplina').AsString    := FDisciplinia;
+      fq.ExecSQL;
+
+      Result := True;
+    except
+      on E: Exception do
+         begin
+           s_Erro := E.Message;
+           Result := False;
+         end;
+    end;
+  finally
+  end;
+end;
+
+function TProfessor.Gerar_ID: Integer;
+begin
+  FConexao.Connected := False;
+  FConexao.Connected := True;
+
+  try
+    fq            := TFDQuery.Create(nil);
+    fq.Connection := FConexao;
+    fq.Close;
+    fq.sql.Clear;
+    fq.sql.Add('select coalesce(max(id), 0) + 1 as id ' +
+               'from aluno                            '
+              );
+    fq.Open;
+
+    Result := fq.FieldByName('id').AsInteger;
+//    raise EArgumentException.Create('sequencia: ' + fq.FieldByName('id').AsString);
+  finally
+    FreeAndNil(fq);
+  end;
+end;
+
+procedure TProfessor.prc_Deletar(i_id_chave: Integer);
+begin
+  FConexao.Connected := False;
+  FConexao.Connected := True;
+
+  FConexao.ExecSQL('delete from professor where id = :id_chave ', [i_id_chave]);
+end;
+
+function TProfessor.Salvar: boolean;
+begin
+
+end;
+
+procedure TProfessor.SetNome(const Value: String);
+begin
+  if Value = EmptyStr then
+    raise EArgumentException.Create('Nome deve ser preenchido');
+
+  FNome := Value;
+end;
+
+end.

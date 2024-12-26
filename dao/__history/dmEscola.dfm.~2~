@@ -1,0 +1,26 @@
+object DataModule1: TDataModule1
+  OldCreateOrder = False
+  Height = 150
+  Width = 215
+  object FDConnection: TFDConnection
+    Params.Strings = (
+      'Database=D:\Projetos\Escola\db\ESCOLA.FDB'
+      'User_Name=SYSDBA'
+      'Password=masterkey'
+      'DriverID=FB')
+    Connected = True
+    LoginPrompt = False
+    Left = 32
+    Top = 16
+  end
+  object FDTransaction: TFDTransaction
+    Connection = FDConnection
+    Left = 112
+    Top = 16
+  end
+  object FDQuery: TFDQuery
+    Connection = FDConnection
+    Left = 80
+    Top = 88
+  end
+end

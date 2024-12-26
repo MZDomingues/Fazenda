@@ -1,0 +1,46 @@
+unit uMenu;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Menus, System.Actions, Vcl.ActnList;
+
+type
+  Tfrm_Menu = class(TForm)
+    m_Menu: TMainMenu;
+    Cadastro1: TMenuItem;
+    Aluno1: TMenuItem;
+    Professor1: TMenuItem;
+    Notas1: TMenuItem;
+    acl_Menu: TActionList;
+    acl_Aluno: TAction;
+    acl_Professor: TAction;
+    acl_Notas: TAction;
+    procedure acl_AlunoExecute(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frm_Menu: Tfrm_Menu;
+
+implementation
+
+{$R *.dfm}
+
+uses uAluno;
+
+procedure Tfrm_Menu.acl_AlunoExecute(Sender: TObject);
+begin
+  frm_Aluno := Tfrm_Aluno.Create(Application);
+  try
+    frm_Aluno.ShowModal;
+  finally
+    frm_Aluno.Free;
+  end;
+end;
+
+end.
