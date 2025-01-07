@@ -1,0 +1,1 @@
+Firebird-2.5.9.27139_0_Win32.exe /verysilent /sp- s/tasks="UseSuperServerTask,UseServiceTask,AutoStartTask" /sysdbapassword="masterkey"
