@@ -16,6 +16,10 @@ Segue abaixo descrito das pastas Projetos\Fazenda:
 
   _Pasta com o banco de dados FAZENDA.FD e bibliotecas do sistema._
 
+**fb**
+
+  _Pasta com o instalador do FireBird._
+
 **imagens**
 
   _Pasta com as imagens utilizadas no sistema._
@@ -46,3 +50,9 @@ Segue abaixo descrito das pastas Projetos\Fazenda:
 **Win32\Debug\relatorios**
 
   _Pasta com os relatórios utilizados._
+
+# Instalação
+
+- Baixar todas as pastas do repositório
+- Executar o arquivo **Banco.bat** da pasta _Projetos\Fazenda\fb_ para instalação do banco
+- Executar o arquivo **ProjetoFazenda** da pasta _Projetos\Fazenda\Win32\Debug_
